@@ -1,65 +1,105 @@
-import Image from "next/image";
+"use client";
+import Link from "next/link";
+import { useStore } from "@/lib/store";
 
-export default function Home() {
+const cards = [
+  {
+    title: "Rorschach Inkblot Test",
+    desc: "Exner Comprehensive System – 10 inkblot cards with full scoring",
+    href: "/tests/rorschach",
+    color: "bg-primary-100 border-primary-300",
+  },
+  {
+    title: "TAT",
+    desc: "Thematic Apperception Test – narrative story analysis",
+    href: "/tests/tat",
+    color: "bg-blue-50 border-blue-200",
+  },
+  {
+    title: "SCT",
+    desc: "Sentence Completion Test – 32 stems across 8 categories",
+    href: "/tests/sct",
+    color: "bg-indigo-50 border-indigo-200",
+  },
+  {
+    title: "DAP / HTP",
+    desc: "Draw-A-Person / House-Tree-Person – symbolic analysis",
+    href: "/tests/dap",
+    color: "bg-violet-50 border-violet-200",
+  },
+];
+
+export default function HomePage() {
+  const { state } = useStore();
+  const unacked = state.alerts.filter((a) => !a.acknowledged).length;
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div>
+      {/* Hero */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-primary-900">AI Projective Testing &amp; Interpretation System</h1>
+        <p className="text-slate-500 mt-1">
+          Administer, score, interpret, and report Rorschach · TAT · SCT · DAP/HTP
+        </p>
+      </div>
+
+      {/* Alert banner */}
+      {unacked > 0 && (
+        <Link
+          href="/dashboard"
+          className="block mb-6 p-4 rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm font-medium"
+        >
+          ⚠️ {unacked} unacknowledged red-flag alert{unacked > 1 ? "s" : ""} — click to review
+        </Link>
+      )}
+
+      {/* Quick stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <Stat label="Clients" value={state.clients.length} />
+        <Stat label="Sessions" value={state.sessions.length} />
+        <Stat label="Reports" value={state.reports.length} />
+        <Stat label="Alerts" value={unacked} accent={unacked > 0} />
+      </div>
+
+      {/* Test cards */}
+      <h2 className="text-lg font-semibold text-primary-800 mb-3">Projective Tests</h2>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {cards.map((c) => (
+          <Link
+            key={c.href}
+            href={c.href}
+            className={`rounded-xl border p-5 ${c.color} hover:shadow-md transition-shadow`}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+            <h3 className="font-bold text-primary-900">{c.title}</h3>
+            <p className="text-xs text-slate-600 mt-1">{c.desc}</p>
+          </Link>
+        ))}
+      </div>
+
+      {/* Quick links */}
+      <div className="grid sm:grid-cols-3 gap-4">
+        <Link href="/clients" className="rounded-xl border border-border bg-white p-5 hover:shadow-md transition-shadow">
+          <h3 className="font-bold text-primary-800">+ New Client</h3>
+          <p className="text-xs text-slate-500 mt-1">Register a new client and start a test battery</p>
+        </Link>
+        <Link href="/interpretation" className="rounded-xl border border-border bg-white p-5 hover:shadow-md transition-shadow">
+          <h3 className="font-bold text-primary-800">Cross-Test Analysis</h3>
+          <p className="text-xs text-slate-500 mt-1">Generate integrated psychodynamic formulation</p>
+        </Link>
+        <Link href="/reports" className="rounded-xl border border-border bg-white p-5 hover:shadow-md transition-shadow">
+          <h3 className="font-bold text-primary-800">Reports</h3>
+          <p className="text-xs text-slate-500 mt-1">Generate PDF/HTML comprehensive reports</p>
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function Stat({ label, value, accent }: { label: string; value: number; accent?: boolean }) {
+  return (
+    <div className="rounded-xl border border-border bg-white p-4">
+      <p className="text-xs text-slate-500 uppercase tracking-wide">{label}</p>
+      <p className={`text-2xl font-bold mt-1 ${accent ? "text-danger" : "text-primary-800"}`}>{value}</p>
     </div>
   );
 }
